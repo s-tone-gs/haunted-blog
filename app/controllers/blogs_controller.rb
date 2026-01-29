@@ -5,7 +5,6 @@ class BlogsController < ApplicationController
 
   before_action :set_blog, only: %i[show]
   before_action :set_current_user_blog, only: %i[edit update destroy]
-  before_action :authorize_random_eyecatch, only: %i[create update]
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
@@ -57,13 +56,11 @@ class BlogsController < ApplicationController
     @blog = current_user.blogs.find(params[:id])
   end
 
-  def authorize_random_eyecatch
-    return if current_user.premium || !blog_params[:random_eyecatch]
-
-    head :bad_request
-  end
-
   def blog_params
-    params.expect(blog: %i[title content secret random_eyecatch])
+    if current_user.premium
+      params.expect(blog: %i[title content secret random_eyecatch])
+    else
+      params.expect(blog: %i[title content secret])
+    end
   end
 end
