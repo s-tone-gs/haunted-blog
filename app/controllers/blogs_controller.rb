@@ -3,8 +3,8 @@
 class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
 
-  before_action :set_blog, only: %i[show edit update destroy]
-  before_action :authorize_user, only: %i[edit update destroy]
+  before_action :set_blog, only: %i[show]
+  before_action :set_current_user_blog, only: %i[edit update destroy]
   before_action :authorize_random_eyecatch, only: %i[create update]
 
   def index
@@ -53,10 +53,8 @@ class BlogsController < ApplicationController
     @blog = Blog.find(params[:id])
   end
 
-  def authorize_user
-    return if @blog.owned_by?(current_user)
-
-    render status: :not_found, html: helpers.tag.strong('編集権限がありません')
+  def set_current_user_blog
+    @blog = current_user.blogs.find(params[:id])
   end
 
   def authorize_random_eyecatch
