@@ -9,6 +9,16 @@ class Blog < ApplicationRecord
 
   scope :published, -> { where('secret = FALSE') }
 
+  scope :owned_by, ->(user) { where('user_id = ?', user.id) }
+
+  scope :exclude_unviewable, lambda { |current_user|
+    if current_user.nil?
+      published
+    else
+      published.or(owned_by(current_user))
+    end
+  }
+
   scope :search, lambda { |term|
     where('title LIKE :t OR content LIKE :t', t: "%#{term}%")
   }
