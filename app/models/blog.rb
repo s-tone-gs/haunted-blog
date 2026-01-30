@@ -20,7 +20,7 @@ class Blog < ApplicationRecord
   }
 
   scope :search, lambda { |term|
-    where('title LIKE :t OR content LIKE :t', t: "%#{term}%")
+    where('title LIKE :term OR content LIKE :term', term: "%#{term}%")
   }
 
   scope :default_order, -> { order(id: :desc) }
