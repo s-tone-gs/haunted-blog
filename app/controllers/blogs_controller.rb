@@ -50,10 +50,8 @@ class BlogsController < ApplicationController
   end
 
   def blog_params
-    if current_user.premium
-      params.expect(blog: %i[title content secret random_eyecatch])
-    else
-      params.expect(blog: %i[title content secret])
-    end
+    white_lists = %i[title content secret]
+    white_lists += [:random_eyecatch] if current_user.premium
+    params.expect(blog: white_lists)
   end
 end
